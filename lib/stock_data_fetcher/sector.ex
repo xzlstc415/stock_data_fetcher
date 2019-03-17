@@ -13,7 +13,7 @@ defmodule StockDataFetcher.Sector do
     sector
     |> cast(params, [:name, :plate_id])
     |> set_type_based_on_plate_id()
-    |> validate_required([:name, :plate_id, :type])
+    |> validate_required([:plate_id, :type])
   end
 
   def set_type_based_on_plate_id(changeset) do
