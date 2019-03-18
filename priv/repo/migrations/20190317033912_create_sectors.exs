@@ -3,7 +3,7 @@ defmodule StockDataFetcher.Repo.Migrations.CreateSectors do
 
   def change do
     create table(:sectors) do
-      add :name, :string, null: false
+      add :name, :string
       add :plate_id, :string, null: false
       add :type, :string, null: false
     end

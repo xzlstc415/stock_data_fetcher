@@ -1,4 +1,6 @@
 defmodule StockDataFetcher.WangyiApi do
+  alias StockDataFetcher.{ Repo, Stock, Sector }
+
   @wangyi_host "http://quotes.money.163.com/hs/service/diyrank.php"
   @fields "CODE,NAME,SYMBOL,PLATE_IDS"
 
@@ -23,9 +25,81 @@ defmodule StockDataFetcher.WangyiApi do
     IO.puts "error: #{reson}"
   end
 
-  def insert_stocks(stock_raw_json) do
-    stock_raw_json
-    |> Map.to_list
-    |> Enum.each(fn { k, v } -> IO.puts "#{k}: #{v}" end)
+  def insert_stocks(raw_json) do
+    stock = insert_stock(raw_json)
+    sectors = insert_sectors(raw_json)
+    case sectors do
+      [] -> nil
+      list -> insert_sector_stocks(stock, sectors)
+    end
+  end
+
+  def stock_field_mapping(key) do
+    %{
+      "CODE" => :code,
+      "NAME" => :name,
+      "SYMBOL" => :symbol
+    }[key]
+  end
+
+  def sector_field_mapping(key) do
+    %{
+      "PLATE_IDS" => :plate_ids
+    }[key]
+  end
+
+  def insert_stock(raw_json) do
+    raw_json
+    |> Enum.map(fn {k, v} -> { stock_field_mapping(k), v } end)
+    |> Enum.filter(fn {k, _} -> k end)
+    |> Enum.into(%{})
+    |> find_or_create_stock
+  end
+
+  def insert_sectors(raw_json) do
+    raw_json
+    |> Enum.map(fn {k, v} -> { sector_field_mapping(k), v } end)
+    |> Enum.filter(fn {k, _} -> k end)
+    |> Enum.into(%{})
+    |> Map.get(:plate_ids)
+    |> Enum.map(fn plate_id -> find_or_create_sector(plate_id) end)
+  end
+
+  def find_or_create_stock(stock) do
+    result =
+      case Repo.get_by(Stock, code: stock.code) do
+        nil -> %Stock{}
+        exist_record -> exist_record
+      end
+      |> Stock.changeset(stock)
+      |> Repo.insert_or_update
+
+    case result do
+      {:ok, model} -> model
+      {:error, changeset} -> IO.puts changeset.errors
+    end
+  end
+
+  def find_or_create_sector(plate_id) do
+    result =
+      case Repo.get_by(Sector, plate_id: plate_id) do
+        nil -> %Sector{}
+        exist_record -> exist_record
+      end
+      |> Sector.changeset(%{plate_id: plate_id})
+      |> Repo.insert_or_update
+
+    case result do
+      {:ok, model} -> model
+      {:error, changeset} -> IO.puts changeset.errors
+    end
+  end
+
+  def insert_sector_stocks(stock, sectors) do
+    stock
+    |> Repo.preload(:sectors)
+    |> Ecto.Changeset.change
+    |> Ecto.Changeset.put_assoc(:sectors, sectors)
+    |> Repo.update
   end
 end
