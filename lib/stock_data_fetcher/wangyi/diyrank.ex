@@ -4,8 +4,13 @@ defmodule StockDataFetcher.WangyiApi do
   @wangyi_host "http://quotes.money.163.com/hs/service/diyrank.php"
   @fields "CODE,NAME,SYMBOL,PLATE_IDS"
 
-  def fetch(count) do
-    :httpc.request(["#{@wangyi_host}?count=#{count}&fields=#{@fields}"])
+  def fetch_all do
+    0..19
+    |> Enum.each(fn n -> fetch(1000, n) end)
+  end
+
+  def fetch(count, page) do
+    :httpc.request(["#{@wangyi_host}?count=#{count}&fields=#{@fields}&page=#{page}"])
     |> handle_response
   end
 
