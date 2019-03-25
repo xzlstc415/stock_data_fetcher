@@ -3,10 +3,10 @@ defmodule StockDataFetcher.Stock do
   import Ecto.Changeset
 
   schema "stocks" do
-    field :name, :string
-    field :code, :string
-    field :symbol, :string
-    many_to_many :sectors, StockDataFetcher.Sector, join_through: "sectors_stocks"
+    field(:name, :string)
+    field(:code, :string)
+    field(:symbol, :string)
+    many_to_many(:sectors, StockDataFetcher.Sector, join_through: "sectors_stocks")
   end
 
   def changeset(stock, params \\ %{}) do

@@ -3,10 +3,10 @@ defmodule StockDataFetcher.Sector do
   import Ecto.Changeset
 
   schema "sectors" do
-    field :name, :string
-    field :plate_id, :string
-    field :type, :string
-    many_to_many :stocks, StockDataFetcher.Stock, join_through: "sectors_stocks"
+    field(:name, :string)
+    field(:plate_id, :string)
+    field(:type, :string)
+    many_to_many(:stocks, StockDataFetcher.Stock, join_through: "sectors_stocks")
   end
 
   def changeset(sector, params \\ %{}) do
@@ -19,7 +19,7 @@ defmodule StockDataFetcher.Sector do
   def set_type_based_on_plate_id(changeset) do
     plate_id = get_field(changeset, :plate_id)
 
-    if (is_nil(plate_id)) do
+    if is_nil(plate_id) do
       changeset
     else
       type = String.slice(plate_id, 0..1)
