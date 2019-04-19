@@ -24,7 +24,8 @@ defmodule StockDataFetcher.MixProject do
     [
       {:ecto_sql, "~> 3.0"},
       {:mariaex, ">= 0.0.0"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:csv, "~> 2.3"}
     ]
   end
 end

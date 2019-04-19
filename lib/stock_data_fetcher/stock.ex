@@ -7,6 +7,8 @@ defmodule StockDataFetcher.Stock do
     field(:code, :string)
     field(:symbol, :string)
     many_to_many(:sectors, StockDataFetcher.Sector, join_through: "sectors_stocks")
+    has_many(:balance_sheets, StockDataFetcher.BalanceSheet)
+    has_many(:income_statements, StockDataFetcher.IncomeStatement)
   end
 
   def changeset(stock, params \\ %{}) do

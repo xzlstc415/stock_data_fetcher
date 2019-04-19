@@ -11,7 +11,6 @@ defmodule StockDataFetcher.Cwsj do
     Stock
     |> select([s], map(s, [:code, :symbol]))
     |> join(:inner, [s], sector in assoc(s, :sectors))
-    |> where([s], s.id > 1295)
     |> group_by([s], s.symbol)
     |> order_by(:symbol)
     |> Repo.all()
@@ -24,13 +23,13 @@ defmodule StockDataFetcher.Cwsj do
   end
 
   def download(symbol) do
-    # :httpc.request(["#{@wangyi_zcfzb_url}#{symbol}.html"])
-    # |> save_zcfzb(symbol)
+    :httpc.request(["#{@wangyi_zcfzb_url}#{symbol}.html?type=year"])
+    |> save_zcfzb(symbol)
 
-    :httpc.request(["#{@wangyi_lrb_url}#{symbol}.html"])
+    :httpc.request(["#{@wangyi_lrb_url}#{symbol}.html?type=year"])
     |> save_lrb(symbol)
 
-    :httpc.request(["#{@wangyi_xjllb_url}#{symbol}.html"])
+    :httpc.request(["#{@wangyi_xjllb_url}#{symbol}.html?type=year"])
     |> save_xjllb(symbol)
   end
 
